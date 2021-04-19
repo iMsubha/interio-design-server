@@ -24,16 +24,41 @@ app.get('/', (req, res) => {
 client.connect(err => {
     //console.log("error",err)
   const serviceCollection = client.db("interiordb").collection("services");
-  
-  //load data from database
+  const adminCollection = client.db("interiordb").collection("admins");
+  const orderCollection = client.db("interiordb").collection("orders");
+ 
+  //load data from service database
   app.get('/services', (req, res) => {
     serviceCollection.find({})
     .toArray((err, documents) => {
       res.send(documents);
     })
  })
+ //load data from admin database
+ app.get('/admin', (req, res) => {
+  adminCollection.find({})
+  .toArray((err, documents) => {
+    res.send(documents);
+  })
+})
+app.get('/admin', (req, res) => {
+  console.log(req.query.email)
+  adminCollection.find({email:req.query.email})
+  .toArray((err, documents) => {
+    console.log(documents)
+    res.send(documents);
+  })
+})
+
+//load data from "order" database
+app.get('/order', (req, res) => {
+  orderCollection.find({})
+  .toArray((err, documents) => {
+    res.send(documents);
+  })
+})
  
-  // post to database
+  // post to "services" database
  app.post('/addServices', (req, res) => {
    const newService = req.body;
    //console.log("new service",newService)
@@ -41,10 +66,41 @@ client.connect(err => {
    .then(result =>{
      console.log('inserted count', result.insertedCount)
      res.send(result.insertedCount > 0)
+    // res.redirect('/addServices')
    })
  })
 
+ //post to "admin" database
+ app.post('/addAdmin', (req, res) => {
+  const newAdmin = req.body;
+  //console.log("new service",newService)
+  adminCollection.insertOne(newAdmin)
+  .then(result =>{
+    console.log('inserted count', result.insertedCount)
+    res.send(result.insertedCount > 0)
+   // res.redirect('/addServices')
+  })
+})
 
+//post to "orders" database
+app.post('/addOrders',(req,res)=>{
+  const newOrder = req.body;
+  orderCollection.insertOne(newOrder)
+  .then(result =>{
+      console.log('inserted count', result.insertedCount)
+      res.send(result.insertedCount > 0)
+    })
+})
+
+// delete from "services" database
+app.delete('/delete/:id', (req, res) => {
+  //console.log(req.params.id);
+  serviceCollection.deleteOne({_id:ObjectId(req.params.id)})
+  .then(result => {
+   res.send(result.deletedCount >0)
+   //res.redirect('/delete/:id');
+  })
+})
 });
 client.connect(err => {
   //console.log("error",err)
