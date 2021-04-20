@@ -65,8 +65,8 @@ app.get('/order', (req, res) => {
    serviceCollection.insertOne(newService)
    .then(result =>{
      console.log('inserted count', result.insertedCount)
-     res.send(result.insertedCount > 0)
-    // res.redirect('/addServices')
+     //res.send(result.insertedCount > 0)
+    res.redirect('/addServices')
    })
  })
 
